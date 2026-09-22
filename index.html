@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Una flor amarilla para ti</title>
+<meta name="description" content="Riega esta flor y mira lo que florece. Feliz 21 de septiembre.">
+<meta name="theme-color" content="#F5C518">
+
+<meta property="og:title" content="Una flor amarilla para ti">
+<meta property="og:description" content="Riega esta flor y mira lo que florece. Feliz 21 de septiembre.">
+<meta property="og:type" content="website">
+
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Playfair+Display:ital,wght@0,500;0,700;1,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<canvas id="fx-canvas" aria-hidden="true"></canvas>
+
+<main id="app">
+
+  <!-- ===================== INTRO ===================== -->
+  <section id="screen-intro" class="screen active" aria-labelledby="intro-title">
+    <div class="intro-sun" aria-hidden="true"></div>
+    <p class="eyebrow">21 de septiembre</p>
+    <h1 id="intro-title">Para <span id="her-name">ella</span></h1>
+    <p id="intro-text" class="intro-text"></p>
+    <button id="start-btn" class="btn btn-primary" type="button">Comenzar 🌻</button>
+  </section>
+
+  <!-- ===================== JUEGO / JARDÍN ===================== -->
+  <section id="screen-garden" class="screen" aria-labelledby="garden-title">
+    <h2 id="garden-title" class="sr-only">Riega la flor</h2>
+
+    <div class="top-bar">
+      <div class="stage-counter" id="stage-counter">Etapa <span id="stage-num">0</span>/5</div>
+      <a href="#" id="skip-link" class="skip-link">Ver el mensaje final →</a>
+    </div>
+
+    <div class="phrase-box" id="phrase-box" aria-live="polite"></div>
+
+    <div id="garden" class="garden">
+      <svg id="flower-svg" class="flower-svg" viewBox="0 0 400 460" role="img"
+           aria-label="Una flor que crece a medida que la riegas" data-stage="0">
+        <defs>
+          <radialGradient id="discGradient" cx="35%" cy="30%" r="75%">
+            <stop offset="0%" stop-color="#FFE28A"/>
+            <stop offset="100%" stop-color="#C9860A"/>
+          </radialGradient>
+        </defs>
+
+        <!-- maceta -->
+        <g id="pot">
+          <path d="M148,432 L252,432 L236,462 L164,462 Z" fill="#8B6B4A"/>
+          <path d="M144,420 L256,420 L252,434 L148,434 Z" fill="#9C7C58"/>
+          <text id="pot-initials" x="200" y="450" text-anchor="middle">H ♡ N</text>
+        </g>
+
+        <!-- tierra -->
+        <ellipse cx="200" cy="420" rx="66" ry="13" fill="#6B5334"/>
+
+        <!-- semilla -->
+        <circle id="seed" cx="200" cy="414" r="6" fill="#4A3A24"/>
+
+        <!-- brote pequeño -->
+        <g id="sprout">
+          <path d="M200,414 C195,402 206,396 200,386" fill="none" stroke="#7C9A5B" stroke-width="4" stroke-linecap="round"/>
+          <path class="sprout-leaf" d="M200,401 q-15,-5 -19,7 q15,5 19,-7 Z" fill="#7C9A5B"/>
+          <path class="sprout-leaf" d="M200,395 q15,-5 19,7 q-15,5 -19,-7 Z" fill="#7C9A5B"/>
+        </g>
+
+        <!-- tallo principal (se dibuja con dashoffset) -->
+        <path id="stem" d="M200,414 C194,330 206,290 200,175"
+              fill="none" stroke="#5A7742" stroke-width="7" stroke-linecap="round"
+              pathLength="100" stroke-dasharray="100" stroke-dashoffset="100"/>
+
+        <!-- hojas grandes -->
+        <path id="leaf-left" class="big-leaf" d="M200,300 C158,289 136,321 126,352 C168,352 196,330 200,300 Z" fill="#7C9A5B"/>
+        <path id="leaf-right" class="big-leaf" d="M200,255 C242,244 264,276 274,307 C232,309 204,287 200,255 Z" fill="#7C9A5B"/>
+
+        <!-- pétalos (generados por JS) -->
+        <g id="petals" transform="translate(200,175)"></g>
+
+        <!-- centro / capullo -->
+        <circle id="center-disc" cx="200" cy="175" r="0" fill="url(#discGradient)"/>
+        <g id="center-dots" transform="translate(200,175)"></g>
+      </svg>
+
+      <div class="watering-can" id="watering-can" aria-hidden="true">💧</div>
+    </div>
+
+    <div class="water-progress" aria-hidden="true">
+      <div id="water-fill" class="water-fill"></div>
+    </div>
+
+    <button id="water-btn" class="btn btn-water" type="button">Mantén presionado para regar 💧</button>
+  </section>
+
+  <!-- ===================== FINAL ===================== -->
+  <section id="screen-final" class="screen" aria-labelledby="final-title">
+    <p class="eyebrow">Feliz 21 de septiembre</p>
+    <h2 id="final-title">🌻</h2>
+    <p id="final-message" class="final-message"></p>
+    <p id="days-together" class="days-together"></p>
+    <p id="song-link-wrap" class="song-link-wrap" hidden><a id="song-link" href="#" target="_blank" rel="noopener">Nuestra canción</a></p>
+    <p id="signature" class="signature"></p>
+
+    <div class="final-actions">
+      <button id="save-btn" class="btn btn-secondary" type="button">Guardar mi flor 💛</button>
+      <button id="share-btn" class="btn btn-secondary" type="button">Compartir</button>
+      <button id="restart-btn" class="btn btn-ghost" type="button">Volver a empezar</button>
+    </div>
+  </section>
+
+</main>
+
+<script src="js/data.js"></script>
+<script src="js/flower.js"></script>
+<script src="js/petals.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

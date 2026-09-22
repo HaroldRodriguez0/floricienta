@@ -1,0 +1,399 @@
+/* ============================================================
+   Floricienta — tokens
+   ============================================================ */
+:root {
+  --bg: #FFFBF0;
+  --bg-warm: #FDF3DC;
+  --amber: #F5C518;
+  --amber-light: #FFD84D;
+  --amber-deep: #E0A800;
+  --leaf: #7C9A5B;
+  --leaf-deep: #5A7742;
+  --ink: #3B2F1E;
+  --ink-soft: #6B5B45;
+  --soil: #8B6B4A;
+
+  --font-display: "Playfair Display", Georgia, serif;
+  --font-hand: "Caveat", "Segoe Script", cursive;
+  --font-ui: system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+/* ============================================================
+   Reset & base
+   ============================================================ */
+* { box-sizing: border-box; }
+html, body {
+  height: 100%;
+  margin: 0;
+  overscroll-behavior: none;
+}
+body {
+  min-height: 100dvh;
+  background:
+    radial-gradient(120% 60% at 50% -10%, #FFF3C4 0%, transparent 60%),
+    linear-gradient(180deg, var(--bg) 0%, var(--bg-warm) 100%);
+  color: var(--ink);
+  font-family: var(--font-ui);
+  overflow-x: hidden;
+  -webkit-tap-highlight-color: transparent;
+}
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+a { color: var(--ink-soft); }
+
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0,0,0,0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ============================================================
+   Fullscreen fx canvas (drops + petal rain)
+   ============================================================ */
+#fx-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 50;
+}
+
+/* ============================================================
+   Screens
+   ============================================================ */
+#app {
+  position: relative;
+  min-height: 100dvh;
+  width: 100%;
+}
+.screen {
+  display: none;
+  min-height: 100dvh;
+  width: 100%;
+  padding: max(24px, env(safe-area-inset-top)) 20px max(24px, env(safe-area-inset-bottom));
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 14px;
+}
+.screen.active {
+  display: flex;
+}
+.eyebrow {
+  font-family: var(--font-ui);
+  font-size: 0.8rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--amber-deep);
+  font-weight: 600;
+  margin: 0;
+}
+
+/* ============================================================
+   Intro
+   ============================================================ */
+#screen-intro { position: relative; overflow: hidden; }
+.intro-sun {
+  position: absolute;
+  top: -140px; left: 50%;
+  transform: translateX(-50%);
+  width: 320px; height: 320px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,216,77,0.55) 0%, rgba(255,216,77,0) 70%);
+  animation: sun-pulse 6s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes sun-pulse {
+  0%, 100% { opacity: 0.7; transform: translateX(-50%) scale(1); }
+  50% { opacity: 1; transform: translateX(-50%) scale(1.08); }
+}
+#intro-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-style: italic;
+  font-size: clamp(2rem, 8vw, 3.2rem);
+  margin: 0;
+  color: var(--ink);
+  position: relative;
+}
+.intro-text {
+  font-family: var(--font-hand);
+  font-size: clamp(1.3rem, 5vw, 1.7rem);
+  color: var(--ink-soft);
+  max-width: 34ch;
+  margin: 0 0 10px;
+  position: relative;
+}
+
+/* ============================================================
+   Buttons
+   ============================================================ */
+.btn {
+  border: none;
+  border-radius: 999px;
+  padding: 14px 28px;
+  font-size: 1.05rem;
+  font-weight: 600;
+  font-family: var(--font-ui);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+  touch-action: manipulation;
+}
+.btn:active { transform: scale(0.96); }
+.btn-primary {
+  background: linear-gradient(135deg, var(--amber-light), var(--amber-deep));
+  color: var(--ink);
+  box-shadow: 0 8px 20px rgba(224, 168, 0, 0.35);
+}
+.btn-primary:hover { filter: brightness(1.05); }
+.btn-secondary {
+  background: #fff;
+  color: var(--ink);
+  border: 1.5px solid var(--amber);
+  box-shadow: 0 4px 12px rgba(59, 47, 30, 0.08);
+}
+.btn-ghost {
+  background: transparent;
+  color: var(--ink-soft);
+  text-decoration: underline;
+  padding: 8px 16px;
+}
+.btn-water {
+  background: linear-gradient(135deg, #DCEBFF, #AFD4FF);
+  color: #1B3A5C;
+  box-shadow: 0 8px 20px rgba(27, 58, 92, 0.18);
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+  width: min(100%, 340px);
+}
+.btn-water:active {
+  filter: brightness(0.97);
+  transform: scale(0.98);
+}
+
+/* ============================================================
+   Garden screen
+   ============================================================ */
+.top-bar {
+  width: 100%;
+  max-width: 480px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.85rem;
+}
+.stage-counter {
+  color: var(--ink-soft);
+  font-weight: 600;
+}
+.skip-link {
+  color: var(--ink-soft);
+  font-size: 0.8rem;
+  text-decoration: none;
+  opacity: 0.7;
+}
+.skip-link:hover { opacity: 1; }
+
+.phrase-box {
+  min-height: 3.2em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-hand);
+  font-size: clamp(1.3rem, 5.5vw, 1.8rem);
+  color: var(--ink);
+  max-width: 30ch;
+}
+.phrase-box .phrase {
+  animation: phrase-in 0.6s ease both;
+}
+@keyframes phrase-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.garden {
+  position: relative;
+  width: min(78vw, 340px);
+  aspect-ratio: 400 / 460;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.flower-svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+#pot-initials {
+  font-family: var(--font-hand);
+  font-size: 22px;
+  fill: #FFE9B8;
+}
+
+/* --- seed --- */
+#seed { transition: opacity 0.5s ease; }
+svg[data-stage="0"] #seed { opacity: 1; }
+svg:not([data-stage="0"]) #seed { opacity: 0; }
+
+/* --- sprout --- */
+#sprout { transition: opacity 0.5s ease, transform 0.5s ease; transform-origin: 200px 414px; }
+svg[data-stage="1"] #sprout { opacity: 1; transform: scale(1); }
+svg:not([data-stage="1"]) #sprout { opacity: 0; transform: scale(0.6); }
+
+/* --- stem draws itself via dashoffset --- */
+#stem { transition: stroke-dashoffset 1s cubic-bezier(.3,.8,.3,1); }
+svg[data-stage="0"] #stem, svg[data-stage="1"] #stem { stroke-dashoffset: 100; }
+svg[data-stage="2"] #stem { stroke-dashoffset: 45; }
+svg[data-stage="3"] #stem,
+svg[data-stage="4"] #stem,
+svg[data-stage="5"] #stem { stroke-dashoffset: 0; }
+
+/* --- big leaves --- */
+.big-leaf {
+  opacity: 0;
+  transform: scale(0.3);
+  transition: opacity 0.7s ease, transform 0.7s cubic-bezier(.3,.8,.3,1);
+}
+#leaf-left { transform-origin: 200px 300px; }
+#leaf-right { transform-origin: 200px 255px; }
+svg[data-stage="2"] .big-leaf,
+svg[data-stage="3"] .big-leaf,
+svg[data-stage="4"] .big-leaf,
+svg[data-stage="5"] .big-leaf {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* --- petal slots (rotation is static per-slot, set inline by JS) --- */
+.petal-slot { transform-origin: 0 0; }
+.petal {
+  transform-origin: 0 0;
+  transform: translateY(-6px) scale(0.05);
+  opacity: 0;
+  fill: var(--amber);
+  transition: transform 0.9s cubic-bezier(.3,.9,.25,1.2), opacity 0.6s ease;
+}
+svg[data-stage="4"] .petal { transform: translateY(-30px) scale(0.55); opacity: 1; fill: var(--amber-light); }
+svg[data-stage="5"] .petal { transform: translateY(-42px) scale(1); opacity: 1; fill: var(--amber); }
+
+/* --- center disc / bud --- */
+#center-disc {
+  transition: r 0.8s cubic-bezier(.3,.8,.3,1), fill 0.8s ease;
+}
+svg[data-stage="0"] #center-disc,
+svg[data-stage="1"] #center-disc,
+svg[data-stage="2"] #center-disc { r: 0; }
+svg[data-stage="3"] #center-disc { r: 12; }
+svg[data-stage="4"] #center-disc { r: 20; }
+svg[data-stage="5"] #center-disc { r: 26; }
+
+#center-dots circle {
+  opacity: 0;
+  transition: opacity 0.6s ease 0.3s;
+}
+svg[data-stage="5"] #center-dots circle { opacity: 1; }
+
+/* --- watering can that follows pointer --- */
+.watering-can {
+  position: absolute;
+  top: 8%;
+  left: 50%;
+  font-size: 2rem;
+  transform: translate(-50%, -50%);
+  transition: opacity 0.2s ease, transform 0.05s linear;
+  opacity: 0;
+  pointer-events: none;
+}
+.watering-can.visible { opacity: 1; }
+
+/* --- water progress bar --- */
+.water-progress {
+  width: min(78vw, 340px);
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(59, 47, 30, 0.08);
+  overflow: hidden;
+}
+.water-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--amber-light), var(--amber-deep));
+  border-radius: inherit;
+  transition: width 0.15s linear;
+}
+
+/* ============================================================
+   Final screen
+   ============================================================ */
+#screen-final {
+  background:
+    radial-gradient(120% 70% at 50% 10%, #FFF3C4 0%, transparent 60%),
+    linear-gradient(180deg, var(--bg) 0%, var(--bg-warm) 100%);
+}
+#final-title {
+  font-size: clamp(2.6rem, 12vw, 4rem);
+  margin: 0;
+}
+.final-message {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: clamp(1.1rem, 4.5vw, 1.4rem);
+  max-width: 36ch;
+  line-height: 1.5;
+  color: var(--ink);
+  margin: 0;
+}
+.days-together {
+  font-family: var(--font-ui);
+  font-size: 0.9rem;
+  color: var(--ink-soft);
+  margin: 0;
+}
+.song-link-wrap { margin: 0; }
+.song-link-wrap a {
+  font-family: var(--font-hand);
+  font-size: 1.3rem;
+}
+.signature {
+  font-family: var(--font-hand);
+  font-size: clamp(1.6rem, 6vw, 2.1rem);
+  color: var(--amber-deep);
+  margin: 4px 0 0;
+}
+.final-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+/* ============================================================
+   Reduced motion
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.2s !important;
+  }
+  .intro-sun { animation: none; }
+}
+
+/* ============================================================
+   Small screens
+   ============================================================ */
+@media (max-width: 360px) {
+  .final-actions { flex-direction: column; width: 100%; }
+  .final-actions .btn { width: 100%; }
+}
