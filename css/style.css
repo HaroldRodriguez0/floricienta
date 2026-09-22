@@ -77,7 +77,7 @@ a { color: var(--ink-soft); }
   display: none;
   min-height: 100dvh;
   width: 100%;
-  padding: max(24px, env(safe-area-inset-top)) 20px max(24px, env(safe-area-inset-bottom));
+  padding: max(24px, env(safe-area-inset-top)) 20px calc(max(24px, env(safe-area-inset-bottom)) + 46px);
   flex-direction: column;
   align-items: center;
   justify-content: center;
@@ -131,6 +131,20 @@ a { color: var(--ink-soft); }
   max-width: 34ch;
   margin: 0 0 10px;
   position: relative;
+}
+.global-footer {
+  position: fixed;
+  left: 16px;
+  right: 16px;
+  bottom: max(14px, env(safe-area-inset-bottom));
+  margin: 0;
+  text-align: center;
+  font-family: var(--font-hand);
+  font-size: clamp(1rem, 4vw, 1.2rem);
+  color: var(--ink-soft);
+  opacity: 0.85;
+  z-index: 40;
+  pointer-events: none;
 }
 
 /* ============================================================
@@ -187,20 +201,13 @@ a { color: var(--ink-soft); }
   max-width: 480px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   font-size: 0.85rem;
 }
 .stage-counter {
   color: var(--ink-soft);
   font-weight: 600;
 }
-.skip-link {
-  color: var(--ink-soft);
-  font-size: 0.8rem;
-  text-decoration: none;
-  opacity: 0.7;
-}
-.skip-link:hover { opacity: 1; }
 
 .phrase-box {
   min-height: 3.2em;
@@ -218,6 +225,10 @@ a { color: var(--ink-soft); }
 @keyframes phrase-in {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+#screen-garden {
+  position: relative;
 }
 
 .garden {
@@ -283,25 +294,32 @@ svg[data-stage="5"] .big-leaf {
   fill: var(--amber);
   transition: transform 0.9s cubic-bezier(.3,.9,.25,1.2), opacity 0.6s ease;
 }
-svg[data-stage="4"] .petal { transform: translateY(-30px) scale(0.55); opacity: 1; fill: var(--amber-light); }
-svg[data-stage="5"] .petal { transform: translateY(-42px) scale(1); opacity: 1; fill: var(--amber); }
+svg[data-stage="4"] .petal { transform: translateY(-22px) scale(0.55); opacity: 1; fill: var(--amber-light); }
+svg[data-stage="5"] .petal { transform: translateY(-30px) scale(1); opacity: 1; fill: var(--amber); }
 
-/* --- center disc / bud --- */
+/* --- center disc / capullo de la rosa --- */
 #center-disc {
   transition: r 0.8s cubic-bezier(.3,.8,.3,1), fill 0.8s ease;
 }
 svg[data-stage="0"] #center-disc,
 svg[data-stage="1"] #center-disc,
 svg[data-stage="2"] #center-disc { r: 0; }
-svg[data-stage="3"] #center-disc { r: 12; }
-svg[data-stage="4"] #center-disc { r: 20; }
-svg[data-stage="5"] #center-disc { r: 26; }
+svg[data-stage="3"] #center-disc { r: 10; }
+svg[data-stage="4"] #center-disc { r: 16; }
+svg[data-stage="5"] #center-disc { r: 20; }
 
-#center-dots circle {
+/* pétalos diminutos, apretados, del centro/capullo */
+.center-petal-slot { transform-origin: 0 0; }
+.center-petal {
+  transform-origin: 0 0;
+  transform: translateY(-2px) scale(0.04);
   opacity: 0;
-  transition: opacity 0.6s ease 0.3s;
+  fill: var(--amber-deep);
+  transition: transform 0.7s cubic-bezier(.3,.8,.3,1), opacity 0.5s ease;
 }
-svg[data-stage="5"] #center-dots circle { opacity: 1; }
+svg[data-stage="3"] .center-petal { transform: translateY(-8px) scale(0.22); opacity: 1; }
+svg[data-stage="4"] .center-petal { transform: translateY(-10px) scale(0.3); opacity: 1; fill: #D99A1B; }
+svg[data-stage="5"] .center-petal { transform: translateY(-12px) scale(0.36); opacity: 1; fill: #D99A1B; }
 
 /* --- watering can that follows pointer --- */
 .watering-can {
@@ -333,16 +351,26 @@ svg[data-stage="5"] #center-dots circle { opacity: 1; }
 }
 
 /* ============================================================
-   Final screen
+   Floración final — la rosa se queda visible, el texto va
+   arriba y abajo de ella, nunca encima
    ============================================================ */
-#screen-final {
-  background:
-    radial-gradient(120% 70% at 50% 10%, #FFF3C4 0%, transparent 60%),
-    linear-gradient(180deg, var(--bg) 0%, var(--bg-warm) 100%);
+.bloom-header,
+.bloom-footer {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
 }
-#final-title {
-  font-size: clamp(2.6rem, 12vw, 4rem);
-  margin: 0;
+#screen-garden.bloomed .bloom-header,
+#screen-garden.bloomed .bloom-footer {
+  display: flex;
+  animation: phrase-in 0.8s ease both;
+}
+#screen-garden.bloomed .top-bar,
+#screen-garden.bloomed .phrase-box,
+#screen-garden.bloomed .water-progress,
+#screen-garden.bloomed .btn-water {
+  display: none;
 }
 .final-message {
   font-family: var(--font-display);

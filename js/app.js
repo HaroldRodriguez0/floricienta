@@ -1,14 +1,23 @@
 // ============================================================
-// app.js — orquesta el juego de riego, las pantallas y las acciones finales
+// app.js — orquesta el juego de riego y el gran final (sin cambiar de pantalla)
 // ============================================================
 (function () {
   "use strict";
 
   const DATA = window.DATA || {};
   const RATE_PER_MS = 100 / 11000; // ~11s de riego sostenido para florecer del todo
+  const AMBIANCE_INTERVAL_MS = 2200;
+
+  // palabras bonitas para la lluvia final (nada de "te amo", a propósito)
+  const LOVE_WORDS = [
+    "te quiero", "amor", "mi vida", "mi niña", "malcriada", "mi sol",
+    "pedacito de vida", "cariño", "mi cielo", "ternura", "mi persona",
+    "corazón", "preciosa", "mi todo", "mi calma",
+  ];
 
   // ---- referencias ----
   const svg = document.getElementById("flower-svg");
+  const gardenScreen = document.getElementById("screen-garden");
   const gardenEl = document.getElementById("garden");
   const waterBtn = document.getElementById("water-btn");
   const wateringCan = document.getElementById("watering-can");
@@ -16,10 +25,7 @@
   const stageNum = document.getElementById("stage-num");
   const phraseBox = document.getElementById("phrase-box");
   const startBtn = document.getElementById("start-btn");
-  const skipLink = document.getElementById("skip-link");
   const restartBtn = document.getElementById("restart-btn");
-  const saveBtn = document.getElementById("save-btn");
-  const shareBtn = document.getElementById("share-btn");
 
   // ---- estado ----
   let water = 0;
@@ -27,6 +33,7 @@
   let watering = false;
   let bloomed = false;
   let lastTime = null;
+  let ambianceTimer = null;
 
   // ============================================================
   // Poblar contenido personal
@@ -34,25 +41,10 @@
   function populateData() {
     setText("her-name", DATA.her || "ti");
     setText("intro-text", DATA.intro || "");
+    setText("global-footer", DATA.footer || "");
     setText("pot-initials", DATA.initials || "");
     setText("final-message", DATA.finalMessage || "");
     setText("signature", DATA.signature || "");
-
-    const daysEl = document.getElementById("days-together");
-    if (DATA.since) {
-      const since = new Date(DATA.since + "T00:00:00");
-      if (!isNaN(since.getTime())) {
-        const days = Math.max(
-          0,
-          Math.floor((Date.now() - since.getTime()) / 86400000)
-        );
-        daysEl.textContent = `Llevamos ${days} día${days === 1 ? "" : "s"} juntos`;
-      } else {
-        daysEl.style.display = "none";
-      }
-    } else {
-      daysEl.style.display = "none";
-    }
 
     const songWrap = document.getElementById("song-link-wrap");
     const songLink = document.getElementById("song-link");
@@ -188,12 +180,50 @@
   }
   requestAnimationFrame(loop);
 
+  // ============================================================
+  // Gran final: pétalos + fuegos artificiales + lluvia de palabras.
+  // Se queda en esta misma pantalla, no avanza sola.
+  // ============================================================
   function triggerBloom() {
     stopWatering();
     const disc = svg.querySelector("#center-disc");
     const rect = disc.getBoundingClientRect();
-    window.Petals.burstBloom(rect.left + rect.width / 2, rect.top + rect.height / 2);
-    setTimeout(() => showScreen("screen-final"), 3200);
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+
+    // ráfaga grande inicial
+    window.Petals.burstBloom(cx, cy);
+    window.Petals.fireworks(cx, cy);
+    setTimeout(() => window.Petals.fireworks(cx - 90, cy - 60), 250);
+    setTimeout(() => window.Petals.fireworks(cx + 90, cy - 40), 500);
+    setTimeout(() => window.Petals.fireworks(cx, cy - 110), 750);
+    setTimeout(() => window.Petals.burstBloom(cx - 60, cy - 20), 900);
+    setTimeout(() => window.Petals.fireworks(cx - 50, cy - 90), 1050);
+    setTimeout(() => window.Petals.fireworks(cx + 50, cy - 70), 1300);
+
+    window.Petals.startWordRain(LOVE_WORDS);
+    window.Petals.startHeartRain();
+
+    // se queda ahí: la fiesta continúa mientras la vea
+    ambianceTimer = setInterval(() => {
+      const ox = cx + (Math.random() - 0.5) * 240;
+      const oy = Math.max(60, cy - 40 - Math.random() * 180);
+      window.Petals.fireworks(ox, oy);
+      if (Math.random() < 0.6) {
+        window.Petals.burstBloom(cx + (Math.random() - 0.5) * 160, cy - Math.random() * 30);
+      }
+    }, AMBIANCE_INTERVAL_MS);
+
+    gardenScreen.classList.add("bloomed");
+  }
+
+  function stopAmbiance() {
+    if (ambianceTimer) {
+      clearInterval(ambianceTimer);
+      ambianceTimer = null;
+    }
+    window.Petals.stopWordRain();
+    window.Petals.stopHeartRain();
   }
 
   // ============================================================
@@ -201,12 +231,8 @@
   // ============================================================
   startBtn.addEventListener("click", () => showScreen("screen-garden"));
 
-  skipLink.addEventListener("click", (e) => {
-    e.preventDefault();
-    showScreen("screen-final");
-  });
-
   restartBtn.addEventListener("click", () => {
+    stopAmbiance();
     water = 0;
     stage = 0;
     bloomed = false;
@@ -214,124 +240,10 @@
     waterFill.style.width = "0%";
     stageNum.textContent = "0";
     phraseBox.innerHTML = "";
+    gardenScreen.classList.remove("bloomed");
     window.Flower.setStage(svg, 0);
     showScreen("screen-intro");
   });
-
-  // ============================================================
-  // Guardar como imagen
-  // ============================================================
-  function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
-    const words = String(text).split(" ");
-    const lines = [];
-    let line = "";
-    for (let n = 0; n < words.length; n++) {
-      const testLine = line + words[n] + " ";
-      if (ctx.measureText(testLine).width > maxWidth && n > 0) {
-        lines.push(line.trim());
-        line = words[n] + " ";
-      } else {
-        line = testLine;
-      }
-    }
-    lines.push(line.trim());
-    const startY = y - ((lines.length - 1) * lineHeight) / 2;
-    lines.forEach((l, i) => ctx.fillText(l, x, startY + i * lineHeight));
-    return lines.length;
-  }
-
-  saveBtn.addEventListener("click", () => {
-    const serializer = new XMLSerializer();
-    const clone = svg.cloneNode(true);
-    clone.setAttribute("data-stage", "5");
-    const svgStr = serializer.serializeToString(clone);
-    const svgBlob = new Blob([svgStr], { type: "image/svg+xml;charset=utf-8" });
-    const url = URL.createObjectURL(svgBlob);
-    const img = new Image();
-    img.onload = () => {
-      const W = 1080;
-      const H = 1350;
-      const canvas = document.createElement("canvas");
-      canvas.width = W;
-      canvas.height = H;
-      const c = canvas.getContext("2d");
-
-      const bg = c.createLinearGradient(0, 0, 0, H);
-      bg.addColorStop(0, "#FFFBF0");
-      bg.addColorStop(1, "#FDF3DC");
-      c.fillStyle = bg;
-      c.fillRect(0, 0, W, H);
-
-      const glow = c.createRadialGradient(W / 2, -80, 50, W / 2, -80, W * 0.9);
-      glow.addColorStop(0, "rgba(255,243,196,0.95)");
-      glow.addColorStop(1, "rgba(255,243,196,0)");
-      c.fillStyle = glow;
-      c.fillRect(0, 0, W, H * 0.55);
-
-      const aspect = 400 / 460;
-      const drawW = W * 0.72;
-      const drawH = drawW / aspect;
-      const dx = (W - drawW) / 2;
-      const dy = H * 0.12;
-      c.drawImage(img, dx, dy, drawW, drawH);
-
-      c.fillStyle = "#3B2F1E";
-      c.textAlign = "center";
-      c.font = "italic 42px 'Playfair Display', Georgia, serif";
-      const lineCount = wrapText(
-        c,
-        DATA.finalMessage || "",
-        W / 2,
-        dy + drawH + 100,
-        W * 0.78,
-        56
-      );
-
-      c.fillStyle = "#E0A800";
-      c.font = "56px 'Caveat', cursive";
-      c.fillText(DATA.signature || "", W / 2, dy + drawH + 100 + lineCount * 32 + 90);
-
-      URL.revokeObjectURL(url);
-      canvas.toBlob((blob) => {
-        const a = document.createElement("a");
-        a.href = URL.createObjectURL(blob);
-        a.download = "mi-flor-amarilla.png";
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-      });
-    };
-    img.src = url;
-  });
-
-  // ============================================================
-  // Compartir
-  // ============================================================
-  shareBtn.addEventListener("click", async () => {
-    const url = window.location.href;
-    const text = `${DATA.her || ""}, tienes una flor amarilla esperándote 🌻`;
-    if (navigator.share) {
-      try {
-        await navigator.share({ title: "Una flor amarilla para ti", text, url });
-        return;
-      } catch (e) {
-        /* usuario canceló, no hacer nada */
-        return;
-      }
-    }
-    try {
-      await navigator.clipboard.writeText(url);
-      flashShareLabel("¡Enlace copiado!");
-    } catch (e) {
-      flashShareLabel(url);
-    }
-  });
-
-  function flashShareLabel(msg) {
-    const original = shareBtn.textContent;
-    shareBtn.textContent = msg;
-    setTimeout(() => (shareBtn.textContent = original), 2200);
-  }
 
   // ============================================================
   // Init

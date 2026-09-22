@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Una flor amarilla para ti</title>
-<meta name="description" content="Riega esta flor y mira lo que florece. Feliz 21 de septiembre.">
+<title>Una rosa amarilla para ti</title>
+<meta name="description" content="Riega esta rosa y mira lo que florece. Feliz 21 de septiembre.">
 <meta name="theme-color" content="#F5C518">
 
-<meta property="og:title" content="Una flor amarilla para ti">
-<meta property="og:description" content="Riega esta flor y mira lo que florece. Feliz 21 de septiembre.">
+<meta property="og:title" content="Una rosa amarilla para ti">
+<meta property="og:description" content="Riega esta rosa y mira lo que florece. Feliz 21 de septiembre.">
 <meta property="og:type" content="website">
 
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
@@ -34,18 +34,21 @@
 
   <!-- ===================== JUEGO / JARDÍN ===================== -->
   <section id="screen-garden" class="screen" aria-labelledby="garden-title">
-    <h2 id="garden-title" class="sr-only">Riega la flor</h2>
+    <h2 id="garden-title" class="sr-only">Riega la rosa</h2>
 
     <div class="top-bar">
       <div class="stage-counter" id="stage-counter">Etapa <span id="stage-num">0</span>/5</div>
-      <a href="#" id="skip-link" class="skip-link">Ver el mensaje final →</a>
     </div>
 
     <div class="phrase-box" id="phrase-box" aria-live="polite"></div>
 
+    <div id="bloom-header" class="bloom-header">
+      <p class="eyebrow">Feliz 21 de septiembre 🌻</p>
+    </div>
+
     <div id="garden" class="garden">
       <svg id="flower-svg" class="flower-svg" viewBox="0 0 400 460" role="img"
-           aria-label="Una flor que crece a medida que la riegas" data-stage="0">
+           aria-label="Una rosa que crece a medida que la riegas" data-stage="0">
         <defs>
           <radialGradient id="discGradient" cx="35%" cy="30%" r="75%">
             <stop offset="0%" stop-color="#FFE28A"/>
@@ -57,7 +60,7 @@
         <g id="pot">
           <path d="M148,432 L252,432 L236,462 L164,462 Z" fill="#8B6B4A"/>
           <path d="M144,420 L256,420 L252,434 L148,434 Z" fill="#9C7C58"/>
-          <text id="pot-initials" x="200" y="450" text-anchor="middle">H ♡ N</text>
+          <text id="pot-initials" x="200" y="450" text-anchor="middle">H ♡ L</text>
         </g>
 
         <!-- tierra -->
@@ -82,10 +85,10 @@
         <path id="leaf-left" class="big-leaf" d="M200,300 C158,289 136,321 126,352 C168,352 196,330 200,300 Z" fill="#7C9A5B"/>
         <path id="leaf-right" class="big-leaf" d="M200,255 C242,244 264,276 274,307 C232,309 204,287 200,255 Z" fill="#7C9A5B"/>
 
-        <!-- pétalos (generados por JS) -->
+        <!-- pétalos de rosa (generados por JS) -->
         <g id="petals" transform="translate(200,175)"></g>
 
-        <!-- centro / capullo -->
+        <!-- centro / capullo cerrado de la rosa -->
         <circle id="center-disc" cx="200" cy="175" r="0" fill="url(#discGradient)"/>
         <g id="center-dots" transform="translate(200,175)"></g>
       </svg>
@@ -98,25 +101,21 @@
     </div>
 
     <button id="water-btn" class="btn btn-water" type="button">Mantén presionado para regar 💧</button>
-  </section>
 
-  <!-- ===================== FINAL ===================== -->
-  <section id="screen-final" class="screen" aria-labelledby="final-title">
-    <p class="eyebrow">Feliz 21 de septiembre</p>
-    <h2 id="final-title">🌻</h2>
-    <p id="final-message" class="final-message"></p>
-    <p id="days-together" class="days-together"></p>
-    <p id="song-link-wrap" class="song-link-wrap" hidden><a id="song-link" href="#" target="_blank" rel="noopener">Nuestra canción</a></p>
-    <p id="signature" class="signature"></p>
-
-    <div class="final-actions">
-      <button id="save-btn" class="btn btn-secondary" type="button">Guardar mi flor 💛</button>
-      <button id="share-btn" class="btn btn-secondary" type="button">Compartir</button>
-      <button id="restart-btn" class="btn btn-ghost" type="button">Volver a empezar</button>
+    <!-- ============ aparece debajo de la rosa cuando florece del todo ============ -->
+    <div id="bloom-footer" class="bloom-footer">
+      <p id="final-message" class="final-message"></p>
+      <p id="song-link-wrap" class="song-link-wrap" hidden><a id="song-link" href="#" target="_blank" rel="noopener">Nuestra canción</a></p>
+      <p id="signature" class="signature"></p>
+      <div class="final-actions">
+        <button id="restart-btn" class="btn btn-ghost" type="button">Volver a empezar</button>
+      </div>
     </div>
   </section>
 
 </main>
+
+<footer id="global-footer" class="global-footer"></footer>
 
 <script src="js/data.js"></script>
 <script src="js/flower.js"></script>
